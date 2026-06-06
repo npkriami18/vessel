@@ -5,7 +5,7 @@ learning01 → learning02 → learning03 → learning04 → learning05 → learn
 >
 > **Harness Layer**: Knowledge loading — inject specialized guidance on demand instead of carrying everything every turn.
 
----
+--- 
 
 ## The Problem
 
