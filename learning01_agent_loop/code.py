@@ -100,7 +100,7 @@ def agent_loop(messages: list):
             model=MODEL,
             messages=api_messages,
             tools=TOOLS,
-            max_completion_tokens=8000,
+            max_completion_tokens=20000,
         )
 
         msg = response.choices[0].message
