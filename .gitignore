@@ -1,0 +1,271 @@
+# Operating system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Editor and IDE settings
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.iml
+*.ipr
+*.iws
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.metadata/
+.history/
+.c9/
+*.code-workspace
+
+# Logs and runtime files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.pid.lock
+*.seed
+*.out
+*.err
+*.stackdump
+
+# Environment and local config
+.env
+.env.*
+*.local
+*.secret
+*.secrets
+.python-version
+.node-version
+.nvmrc.local
+.direnv/
+.envrc
+
+# Dependencies and package managers
+node_modules/
+bower_components/
+jspm_packages/
+.pnp/
+.pnp.js
+.pnpm-store/
+.npm/
+.yarn/
+.yarn-cache/
+.yarnrc.yml
+
+# Build outputs and caches
+build/
+dist/
+out/
+tmp/
+temp/
+.cache/
+.cache-loader/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.storybook-out/
+coverage/
+lib-cov/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_*/
+.nyc_output/
+
+# Java / JVM
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+out/
+target/
+
+# Kotlin
+.kotlin/
+
+# Go
+bin/
+.coverprofile
+
+# Rust
+target/
+Cargo.lock
+
+# .NET / C#
+bin/
+obj/
+*.rsuser
+*.userprefs
+*.dbmdl
+
+# C / C++
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+*.exe
+*.exp
+*.idb
+*.pdb
+*.ilk
+*.manifest
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+Makefile
+makedep*
+libtool
+autom4te.cache/
+m4/
+
+# Swift / Xcode
+.build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+*.xcuserstate
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.pyo
+*.egg
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+site/
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+poetry.lock
+Pipfile.lock
+
+# PHP / Composer
+/vendor/
+composer.lock
+
+# Ruby
+.bundle/
+.yardoc/
+.yardoc/
+coverage/
+.pkg/
+.ruby-version
+.ruby-gemset
+
+# Elixir
+/_build/
+/deps/
+erl_crash.dump
+
+# Haskell
+.stack-work/
+dist-newstyle/
+.cabal-sandbox/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+# Serverless / cloud
+.serverless/
+.aws-sam/
+
+# Docker / containers
+.docker/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Archives and packaged artifacts
+*.7z
+*.gz
+*.zip
+*.tar
+*.tgz
+*.bz2
+*.rar
+
+# Misc generated files
+release/
+debug/
+.cache/
+.sass-cache/
+.tmp/
+
+# Test artifacts
+junit.xml
+test-results/
+playwright-report/
+blob-report/
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+
