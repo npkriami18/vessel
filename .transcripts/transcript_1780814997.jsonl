@@ -1,0 +1,27 @@
+{"role": "user", "content": "do a live demo of all your tools one by one "}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_BnhQHJvhnZvLgC0xzbQHfiyu", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and repo context for demo-safe actions\",\"status\":\"in_progress\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"pending\"},{\"content\":\"Summarize results for the user\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_BnhQHJvhnZvLgC0xzbQHfiyu", "content": "Updated 3 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_GtewJRjrC9O5OKhNCNTZu62g", "type": "function", "function": {"name": "bash", "arguments": "{\"command\": \"pwd && ls -1 | head\"}"}}, {"id": "call_J0uKKNA7fRvnnStpMCIF2m0R", "type": "function", "function": {"name": "glob", "arguments": "{\"pattern\": \"**/*\"}"}}]}
+{"role": "tool", "tool_call_id": "call_GtewJRjrC9O5OKhNCNTZu62g", "content": "[Earlier tool result compacted. Re-run if needed.]"}
+{"role": "tool", "tool_call_id": "call_J0uKKNA7fRvnnStpMCIF2m0R", "content": "[Earlier tool result compacted. Re-run if needed.]"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_lDpluYtDNuH2QAd82DqALOJi", "type": "function", "function": {"name": "read_file", "arguments": "{\"path\":\"README.md\",\"limit\":40}"}}]}
+{"role": "tool", "tool_call_id": "call_lDpluYtDNuH2QAd82DqALOJi", "content": "# vessel\nAn operational environment for AI models"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_fX9i07rWlqBTbc0ClSX63IXc", "type": "function", "function": {"name": "write_file", "arguments": "{\"path\":\"tool_demo_tmp.txt\",\"content\":\"Temporary file created to demonstrate write_file.\\n\"}"}}]}
+{"role": "tool", "tool_call_id": "call_fX9i07rWlqBTbc0ClSX63IXc", "content": "Wrote 50 bytes to tool_demo_tmp.txt"}
+{"role": "user", "content": "<reminder>Update your todos.</reminder>"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_dypQoS3xDkasNo2DBjXoXIOa", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and repo context for demo-safe actions\",\"status\":\"completed\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"in_progress\"},{\"content\":\"Summarize results for the user\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_dypQoS3xDkasNo2DBjXoXIOa", "content": "Updated 3 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_8EmWVHbFqLk4WbvDJDYEyBQl", "type": "function", "function": {"name": "edit_file", "arguments": "{\"path\":\"tool_demo_tmp.txt\",\"old_text\":\"Temporary file created to demonstrate write_file.\\n\",\"new_text\":\"Temporary file edited to demonstrate edit_file.\\n\"}"}}]}
+{"role": "tool", "tool_call_id": "call_8EmWVHbFqLk4WbvDJDYEyBQl", "content": "Edited tool_demo_tmp.txt"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_BRjvIYSSJAg60Wbukd4UYFwU", "type": "function", "function": {"name": "read_file", "arguments": "{\"path\":\"tool_demo_tmp.txt\",\"limit\":20}"}}]}
+{"role": "tool", "tool_call_id": "call_BRjvIYSSJAg60Wbukd4UYFwU", "content": "Temporary file edited to demonstrate edit_file."}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_ZwDPJ8O3jbwZoB1YawWCrKRW", "type": "function", "function": {"name": "task", "arguments": "{\"description\":\"Briefly inspect the repository and return a one-sentence summary suitable for a tool demo.\"}"}}]}
+{"role": "tool", "tool_call_id": "call_ZwDPJ8O3jbwZoB1YawWCrKRW", "content": "[Earlier tool result compacted. Re-run if needed.]"}
+{"role": "user", "content": "<reminder>Update your todos.</reminder>"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_DL0ItDfkGR0MS76g2Yd7O2IV", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and repo context for demo-safe actions\",\"status\":\"completed\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"in_progress\"},{\"content\":\"Demonstrate remaining tools: load_skill and compact if possible\",\"status\":\"in_progress\"},{\"content\":\"Summarize results for the user\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_DL0ItDfkGR0MS76g2Yd7O2IV", "content": "Updated 4 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_oPhompdWBU1QNz3OVOrZeolB", "type": "function", "function": {"name": "bash", "arguments": "{\"command\":\"ls -1 tool_demo_tmp.txt README.md 2>/dev/null\"}"}}]}
+{"role": "tool", "tool_call_id": "call_oPhompdWBU1QNz3OVOrZeolB", "content": "README.md\ntool_demo_tmp.txt"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_dZs8aaHyzwQ5i2AowMyhc6VM", "type": "function", "function": {"name": "load_skill", "arguments": "{\"name\":\"nonexistent\"}"}}]}
+{"role": "tool", "tool_call_id": "call_dZs8aaHyzwQ5i2AowMyhc6VM", "content": "Skill not found: nonexistent"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_CbmfY95AtXD4qxPWiMCNDXgv", "type": "function", "function": {"name": "compact", "arguments": "{\"focus\":\"Preserve only the outcomes of the tool demo so far.\"}"}}]}

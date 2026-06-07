@@ -1,0 +1,24 @@
+{"role": "user", "content": "do a live demo of all your tools one by one"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_4KG2WXpVZmNuQrM6bF8PBmdh", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and plan live demo sequence\",\"status\":\"in_progress\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"pending\"},{\"content\":\"Summarize demo results and note unavailable tools\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_4KG2WXpVZmNuQrM6bF8PBmdh", "content": "Updated 3 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_jqq4WedBNmoXqhTCpHz3mm3S", "type": "function", "function": {"name": "bash", "arguments": "{\"command\":\"pwd && ls -1 | head\"}"}}]}
+{"role": "tool", "tool_call_id": "call_jqq4WedBNmoXqhTCpHz3mm3S", "content": "[Earlier tool result compacted. Re-run if needed.]"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_BpOasyd4j1oOk88Q4ZOkr7zL", "type": "function", "function": {"name": "read_file", "arguments": "{\"path\":\"/workspaces/vessel/README.md\",\"limit\":20}"}}]}
+{"role": "tool", "tool_call_id": "call_BpOasyd4j1oOk88Q4ZOkr7zL", "content": "# vessel\nAn operational environment for AI models"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_jZM1yhAmcjrClVdV0tsRw7AL", "type": "function", "function": {"name": "write_file", "arguments": "{\"path\":\"/workspaces/vessel/tool_demo_tmp.txt\",\"content\":\"temporary demo file\\n\"}"}}]}
+{"role": "tool", "tool_call_id": "call_jZM1yhAmcjrClVdV0tsRw7AL", "content": "Wrote 20 bytes to /workspaces/vessel/tool_demo_tmp.txt"}
+{"role": "user", "content": "<reminder>Update your todos.</reminder>"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_psG857AHILeNSXSYlxJgMAbT", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and plan live demo sequence\",\"status\":\"completed\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"in_progress\"},{\"content\":\"Summarize demo results and note unavailable tools\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_psG857AHILeNSXSYlxJgMAbT", "content": "Updated 3 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_npWqCDNshsNhJJ9NZQBh4O7d", "type": "function", "function": {"name": "edit_file", "arguments": "{\"path\":\"/workspaces/vessel/tool_demo_tmp.txt\",\"old_text\":\"temporary demo file\\n\",\"new_text\":\"temporary demo file edited\\n\"}"}}]}
+{"role": "tool", "tool_call_id": "call_npWqCDNshsNhJJ9NZQBh4O7d", "content": "Edited /workspaces/vessel/tool_demo_tmp.txt"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_wNGwQajGzFDjSWaWnDVEXWBC", "type": "function", "function": {"name": "glob", "arguments": "{\"pattern\":\"/workspaces/vessel/*.txt\"}"}}]}
+{"role": "tool", "tool_call_id": "call_wNGwQajGzFDjSWaWnDVEXWBC", "content": "/workspaces/vessel/requirements.txt\n/workspaces/vessel/tool_demo_tmp.txt"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_z1X1oX7UrMsc0I2aWC4qpGFd", "type": "function", "function": {"name": "task", "arguments": "{\"description\":\"In one sentence, confirm that the subagent tool was invoked successfully for a live demo and mention no further action is needed.\"}"}}]}
+{"role": "tool", "tool_call_id": "call_z1X1oX7UrMsc0I2aWC4qpGFd", "content": "The subagent tool was invoked successfully for the live demo, and no further action is needed."}
+{"role": "user", "content": "<reminder>Update your todos.</reminder>"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_fFIcZ4LpZFZ0kMSfIfxLC0v3", "type": "function", "function": {"name": "todo_write", "arguments": "{\"todos\":[{\"content\":\"Inspect available tools and plan live demo sequence\",\"status\":\"completed\"},{\"content\":\"Demonstrate each usable tool one by one with safe operations\",\"status\":\"in_progress\"},{\"content\":\"Summarize demo results and note unavailable tools\",\"status\":\"pending\"}]}"}}]}
+{"role": "tool", "tool_call_id": "call_fFIcZ4LpZFZ0kMSfIfxLC0v3", "content": "Updated 3 tasks"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_A9ASfgD5tXeriirQg5t1BmaW", "type": "function", "function": {"name": "load_skill", "arguments": "{\"name\":\"nonexistent-skill-demo\"}"}}]}
+{"role": "tool", "tool_call_id": "call_A9ASfgD5tXeriirQg5t1BmaW", "content": "Skill not found: nonexistent-skill-demo"}
+{"role": "assistant", "content": null, "tool_calls": [{"id": "call_ONgnVVx4AlvAXVHJo1aapJYI", "type": "function", "function": {"name": "compact", "arguments": "{\"focus\":\"Live demo of all tools used so far and remaining wrapper tool.\"}"}}]}
