@@ -1,0 +1,4 @@
+- [user-preference-learning0-convention](user-preference-learning0-convention.md) — User prefers the 'learning0' naming convention instead of 's0'.
+- [user-preference-remove-chinese-references](user-preference-remove-chinese-references.md) — User wants Chinese references removed from any file they ask to edit or write.
+- [user-preference-single-quotes](user-preference-single-quotes.md) — User prefers single quotes over double quotes for strings.
+- [user-preference-tabs-indentation](user-preference-tabs-indentation.md) — User prefers tabs instead of spaces for indentation.
