@@ -1,0 +1,9 @@
+[
+  {
+    "id": "cron_366426",
+    "cron": "43 0 9 6 *",
+    "prompt": "Check the build status.",
+    "recurring": false,
+    "durable": true
+  }
+]
