@@ -1,0 +1,10 @@
+{
+  "id": "task_1780938719_6215",
+  "subject": "write docs",
+  "description": "Write documentation after the database schema is set up.",
+  "status": "completed",
+  "owner": "agent",
+  "blockedBy": [
+    "task_1780938718_0086"
+  ]
+}
