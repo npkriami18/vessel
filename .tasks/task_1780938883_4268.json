@@ -2,7 +2,7 @@
   "id": "task_1780938883_4268",
   "subject": "setup database schema",
   "description": "Define and implement the initial database schema.",
-  "status": "pending",
-  "owner": null,
+  "status": "completed",
+  "owner": "bob",
   "blockedBy": []
 }

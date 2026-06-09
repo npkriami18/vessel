@@ -1,0 +1,8 @@
+{
+  "id": "task_1780980816_3934",
+  "subject": "Task 1",
+  "description": "Auto-claim and work task 1",
+  "status": "in_progress",
+  "owner": "alice",
+  "blockedBy": []
+}

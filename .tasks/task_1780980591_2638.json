@@ -1,0 +1,8 @@
+{
+  "id": "task_1780980591_2638",
+  "subject": "Task 1",
+  "description": "General task created per user request.",
+  "status": "completed",
+  "owner": "bob",
+  "blockedBy": []
+}
