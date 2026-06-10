@@ -1,4 +1,0 @@
-{"from": "alice", "to": "lead", "content": "alice claimed task_1781058412_9811 and started work in /workspaces/vessel/.worktrees/alice-wt. Inspecting repository and task context now.", "type": "message", "ts": 1781058423.4791744, "metadata": {}}
-{"from": "bob", "to": "lead", "content": "bob claimed task_1781058413_9661 and is starting work in /workspaces/vessel/.worktrees/bob-wt. I\u2019ll inspect the repo/task details and report progress.", "type": "message", "ts": 1781058424.2688522, "metadata": {}}
-{"from": "alice", "to": "lead", "content": "Done.", "type": "result", "ts": 1781058494.4527647, "metadata": {}}
-{"from": "bob", "to": "lead", "content": "Done.", "type": "result", "ts": 1781058500.0920975, "metadata": {}}

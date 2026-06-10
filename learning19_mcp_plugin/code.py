@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-s19: MCP Tools — MCPClient + tool discovery + assemble_tool_pool.
+learning19: MCP Tools — MCPClient + tool discovery + assemble_tool_pool.
 
-Run:  python s19_mcp_plugin/code.py
-Need: pip install openai python-dotenv + .env with AZURE_API_KEY
+Run:  python learning19_mcp_plugin/code.py
+Need: pip install openai pyyaml python-dotenv + .env with AZURE_* vars
 
-Changes from s18:
+Changes from learning18:
   - MCPClient class: discovers tools, calls tools via mock handler
   - normalize_mcp_name: normalize tool/server names
   - assemble_tool_pool: assembles builtin + MCP tools into one pool
   - connect_mcp: connect to an MCP server, discover tools
   - Tool naming: mcp__{server}__{tool} with normalization
   - MCP tools have readOnly/destructive annotations
-  - agent_loop uses dynamic tool pool (builtin + MCP), no prompt cache
-  - Teammate tools: complete_task, worktree cwd (from s17/s18 fixes)
+  - agent_loop uses dynamic tool pool (builtin + MCP)
+  - Teammate tools: complete_task, worktree cwd (from learning17/learning18 fixes)
 
 ASCII flow:
   connect_mcp("docs") → MCPClient discovers tools →
@@ -43,7 +43,7 @@ client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_ENDPOINT"),
     api_key=os.getenv("AZURE_API_KEY"),
 )
-MODEL = os.environ["AZURE_DEPLOYMENT"]
+MODEL = os.getenv("AZURE_DEPLOYMENT")
 
 # ── Task System ──
 
@@ -434,6 +434,26 @@ def idle_poll(agent_name: str, messages: list,
     return "timeout"
 
 
+# ── _group_messages — atomic pair safety for compaction ──
+
+def _group_messages(messages):
+    """Group messages into atomic units: lone messages, or (assistant+tool_calls, tool…) pairs."""
+    groups, i = [], 0
+    while i < len(messages):
+        msg = messages[i]
+        if msg.get("role") == "assistant" and msg.get("tool_calls"):
+            group = [msg]
+            i += 1
+            while i < len(messages) and messages[i].get("role") == "tool":
+                group.append(messages[i])
+                i += 1
+            groups.append(group)
+        else:
+            groups.append([msg])
+            i += 1
+    return groups
+
+
 # ── Teammate Thread ──
 
 def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
@@ -500,44 +520,52 @@ def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
 
         messages = [{"role": "user", "content": prompt}]
         sub_tools = [
-            {"name": "bash", "description": "Run a shell command.",
-             "input_schema": {"type": "object",
-                              "properties": {"command": {"type": "string"}},
-                              "required": ["command"]}},
-            {"name": "read_file", "description": "Read file.",
-             "input_schema": {"type": "object",
-                              "properties": {"path": {"type": "string"}},
-                              "required": ["path"]}},
-            {"name": "write_file", "description": "Write file.",
-             "input_schema": {"type": "object",
-                              "properties": {"path": {"type": "string"},
-                                             "content": {"type": "string"}},
-                              "required": ["path", "content"]}},
-            {"name": "send_message",
-             "description": "Send message to another agent.",
-             "input_schema": {"type": "object",
-                              "properties": {"to": {"type": "string"},
-                                             "content": {"type": "string"}},
-                              "required": ["to", "content"]}},
-            {"name": "submit_plan",
-             "description": "Submit a plan for Lead approval.",
-             "input_schema": {"type": "object",
-                              "properties": {"plan": {"type": "string"}},
-                              "required": ["plan"]}},
-            {"name": "list_tasks",
-             "description": "List all tasks.",
-             "input_schema": {"type": "object", "properties": {},
-                              "required": []}},
-            {"name": "claim_task",
-             "description": "Claim a pending task.",
-             "input_schema": {"type": "object",
-                              "properties": {"task_id": {"type": "string"}},
-                              "required": ["task_id"]}},
-            {"name": "complete_task",
-             "description": "Mark an in-progress task as completed.",
-             "input_schema": {"type": "object",
-                              "properties": {"task_id": {"type": "string"}},
-                              "required": ["task_id"]}},
+            {"type": "function", "function": {
+                "name": "bash", "description": "Run a shell command.",
+                "parameters": {"type": "object",
+                               "properties": {"command": {"type": "string"}},
+                               "required": ["command"]}}},
+            {"type": "function", "function": {
+                "name": "read_file", "description": "Read file.",
+                "parameters": {"type": "object",
+                               "properties": {"path": {"type": "string"}},
+                               "required": ["path"]}}},
+            {"type": "function", "function": {
+                "name": "write_file", "description": "Write file.",
+                "parameters": {"type": "object",
+                               "properties": {"path": {"type": "string"},
+                                              "content": {"type": "string"}},
+                               "required": ["path", "content"]}}},
+            {"type": "function", "function": {
+                "name": "send_message",
+                "description": "Send message to another agent.",
+                "parameters": {"type": "object",
+                               "properties": {"to": {"type": "string"},
+                                              "content": {"type": "string"}},
+                               "required": ["to", "content"]}}},
+            {"type": "function", "function": {
+                "name": "submit_plan",
+                "description": "Submit a plan for Lead approval.",
+                "parameters": {"type": "object",
+                               "properties": {"plan": {"type": "string"}},
+                               "required": ["plan"]}}},
+            {"type": "function", "function": {
+                "name": "list_tasks",
+                "description": "List all tasks.",
+                "parameters": {"type": "object", "properties": {},
+                               "required": []}}},
+            {"type": "function", "function": {
+                "name": "claim_task",
+                "description": "Claim a pending task.",
+                "parameters": {"type": "object",
+                               "properties": {"task_id": {"type": "string"}},
+                               "required": ["task_id"]}}},
+            {"type": "function", "function": {
+                "name": "complete_task",
+                "description": "Mark an in-progress task as completed.",
+                "parameters": {"type": "object",
+                               "properties": {"task_id": {"type": "string"}},
+                               "required": ["task_id"]}}},
         ]
 
         sub_handlers = {
@@ -573,36 +601,38 @@ def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
                         messages.append({"role": "user",
                             "content": "<inbox>" + json.dumps(non_protocol) + "</inbox>"})
                 try:
+                    # Safe tail slice — never splits an atomic assistant+tool pair
+                    tail = [m for g in _group_messages(messages[-20:])[-10:] for m in g]
                     response = client.chat.completions.create(
                         model=MODEL,
-                        messages=[{"role": "system", "content": system}] + messages[-20:],
+                        messages=[{"role": "system", "content": system}] + tail,
                         tools=sub_tools,
-                        max_completion_tokens=8000,
-                    )
+                        max_completion_tokens=8000)
                 except Exception:
                     break
 
-                assistant_msg = response.choices[0].message
-                assistant_dict = {"role": "assistant", "content": assistant_msg.content}
-                if getattr(assistant_msg, "tool_calls", None):
-                    assistant_dict["tool_calls"] = [tc.model_dump() for tc in assistant_msg.tool_calls]
-                messages.append(assistant_dict)
+                choice = response.choices[0]
+                assistant_msg = choice.message
+                msg_dict = {"role": "assistant", "content": assistant_msg.content}
+                if assistant_msg.tool_calls:
+                    msg_dict["tool_calls"] = [tc.model_dump() for tc in assistant_msg.tool_calls]
+                messages.append(msg_dict)
 
-                if response.choices[0].finish_reason != "tool_calls":
+                if choice.finish_reason != "tool_calls":
                     break
 
-                results = []
-                if getattr(assistant_msg, "tool_calls", None):
-                    for tc in assistant_msg.tool_calls:
-                        fn_name = tc.function.name
-                        args = json.loads(tc.function.arguments) if tc.function.arguments else {}
-                        handler = sub_handlers.get(fn_name)
-                        output = handler(**args) if handler else "Unknown"
-                        # append tool message (atomic pair: assistant + tool)
-                        messages.append({"role": "tool", "tool_call_id": tc.id, "content": str(output)})
-                        results.append({"type": "tool_result", "tool_use_id": tc.id, "content": str(output)})
-                if results:
-                    messages.append({"role": "user", "content": results})
+                # Emit one role="tool" message per tool call
+                for tc in (assistant_msg.tool_calls or []):
+                    fn_name = tc.function.name
+                    handler = sub_handlers.get(fn_name)
+                    args = json.loads(tc.function.arguments)
+                    output = handler(**args) if handler else "Unknown"
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tc.id,
+                        "content": str(output),
+                    })
+
             if should_shutdown:
                 break
             idle_result = idle_poll(name, messages, name, role)
@@ -611,13 +641,8 @@ def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
 
         summary = "Done."
         for msg in reversed(messages):
-            if msg["role"] == "assistant" and isinstance(msg["content"], list):
-                for b in msg["content"]:
-                    if getattr(b, "type", None) == "text":
-                        summary = b.text
-                        break
-                else:
-                    continue
+            if msg.get("role") == "assistant" and msg.get("content"):
+                summary = msg["content"]
                 break
         BUS.send(name, "lead", summary, "result")
         active_teammates.pop(name, None)
@@ -670,7 +695,7 @@ def run_review_plan(request_id: str, approve: bool,
     return f"Plan {'approved' if approve else 'rejected'}"
 
 
-# ── MCP System (s19 new) ──
+# ── MCP System ──
 
 class MCPClient:
     """Discovers and calls tools on an MCP server (mock for teaching)."""
@@ -706,8 +731,8 @@ def normalize_mcp_name(name: str) -> str:
 
 
 def _mock_server_docs():
-    client = MCPClient("docs")
-    client.register(
+    mcp = MCPClient("docs")
+    mcp.register(
         tool_defs=[
             {"name": "search", "description": "Search documentation. (readOnly)",
              "inputSchema": {"type": "object",
@@ -721,12 +746,12 @@ def _mock_server_docs():
             "search": lambda query: f"[docs] Found 3 results for '{query}'",
             "get_version": lambda: "[docs] API v2.1.0",
         })
-    return client
+    return mcp
 
 
 def _mock_server_deploy():
-    client = MCPClient("deploy")
-    client.register(
+    mcp = MCPClient("deploy")
+    mcp.register(
         tool_defs=[
             {"name": "trigger",
              "description": "Trigger a deployment. (destructive — requires approval in real CC)",
@@ -742,7 +767,7 @@ def _mock_server_deploy():
             "trigger": lambda service: f"[deploy] Triggered: {service}",
             "status": lambda service: f"[deploy] {service}: running (v1.4.2)",
         })
-    return client
+    return mcp
 
 
 MOCK_SERVERS = {
@@ -767,7 +792,7 @@ def connect_mcp(name: str) -> str:
 
 
 def assemble_tool_pool() -> tuple[list[dict], dict]:
-    """Assemble builtin tools + all MCP tools into one pool."""
+    """Assemble builtin tools + all MCP tools into one pool (Azure format)."""
     tools = list(BUILTIN_TOOLS)
     handlers = dict(BUILTIN_HANDLERS)
     for server_name, mcp_client in mcp_clients.items():
@@ -776,9 +801,12 @@ def assemble_tool_pool() -> tuple[list[dict], dict]:
             safe_tool = normalize_mcp_name(tool_def["name"])
             prefixed = f"mcp__{safe_server}__{safe_tool}"
             tools.append({
-                "name": prefixed,
-                "description": tool_def.get("description", ""),
-                "input_schema": tool_def.get("inputSchema", {}),
+                "type": "function",
+                "function": {
+                    "name": prefixed,
+                    "description": tool_def.get("description", ""),
+                    "parameters": tool_def.get("inputSchema", {}),
+                },
             })
             handlers[prefixed] = (
                 lambda *, c=mcp_client, t=tool_def["name"], **kw: c.call_tool(t, kw))
@@ -849,98 +877,82 @@ def run_connect_mcp(name: str) -> str:
     return connect_mcp(name)
 
 
-# ── Tool Definitions ──
+# ── Tool Definitions (Azure format) ──
+
+def _fn(name, description, parameters):
+    """Shorthand to build an Azure function-tool dict."""
+    return {"type": "function", "function": {"name": name,
+                                              "description": description,
+                                              "parameters": parameters}}
 
 BUILTIN_TOOLS = [
-    {"name": "bash", "description": "Run a shell command.",
-     "input_schema": {"type": "object",
-                      "properties": {"command": {"type": "string"}},
-                      "required": ["command"]}},
-    {"name": "read_file", "description": "Read file contents.",
-     "input_schema": {"type": "object",
-                      "properties": {"path": {"type": "string"},
-                                     "limit": {"type": "integer"}},
-                      "required": ["path"]}},
-    {"name": "write_file", "description": "Write content to a file.",
-     "input_schema": {"type": "object",
-                      "properties": {"path": {"type": "string"},
-                                     "content": {"type": "string"}},
-                      "required": ["path", "content"]}},
-    {"name": "create_task", "description": "Create a task.",
-     "input_schema": {"type": "object",
-                      "properties": {"subject": {"type": "string"},
-                                     "description": {"type": "string"},
-                                     "blockedBy": {"type": "array",
-                                                   "items": {"type": "string"}}},
-                      "required": ["subject"]}},
-    {"name": "list_tasks", "description": "List all tasks.",
-     "input_schema": {"type": "object", "properties": {}, "required": []}},
-    {"name": "get_task", "description": "Get full task details.",
-     "input_schema": {"type": "object",
-                      "properties": {"task_id": {"type": "string"}},
-                      "required": ["task_id"]}},
-    {"name": "claim_task", "description": "Claim a pending task.",
-     "input_schema": {"type": "object",
-                      "properties": {"task_id": {"type": "string"}},
-                      "required": ["task_id"]}},
-    {"name": "complete_task", "description": "Complete an in-progress task.",
-     "input_schema": {"type": "object",
-                      "properties": {"task_id": {"type": "string"}},
-                      "required": ["task_id"]}},
-    {"name": "spawn_teammate", "description": "Spawn an autonomous teammate.",
-     "input_schema": {"type": "object",
-                      "properties": {"name": {"type": "string"},
-                                     "role": {"type": "string"},
-                                     "prompt": {"type": "string"}},
-                      "required": ["name", "role", "prompt"]}},
-    {"name": "send_message", "description": "Send message to a teammate.",
-     "input_schema": {"type": "object",
-                      "properties": {"to": {"type": "string"},
-                                     "content": {"type": "string"}},
-                      "required": ["to", "content"]}},
-    {"name": "check_inbox",
-     "description": "Check inbox for messages and protocol responses.",
-     "input_schema": {"type": "object", "properties": {}, "required": []}},
-    {"name": "request_shutdown",
-     "description": "Request a teammate to shut down.",
-     "input_schema": {"type": "object",
-                      "properties": {"teammate": {"type": "string"}},
-                      "required": ["teammate"]}},
-    {"name": "request_plan",
-     "description": "Ask a teammate to submit a plan.",
-     "input_schema": {"type": "object",
-                      "properties": {"teammate": {"type": "string"},
-                                     "task": {"type": "string"}},
-                      "required": ["teammate", "task"]}},
-    {"name": "review_plan",
-     "description": "Approve or reject a submitted plan.",
-     "input_schema": {"type": "object",
-                      "properties": {"request_id": {"type": "string"},
-                                     "approve": {"type": "boolean"},
-                                     "feedback": {"type": "string"}},
-                      "required": ["request_id", "approve"]}},
-    {"name": "create_worktree",
-     "description": "Create an isolated git worktree.",
-     "input_schema": {"type": "object",
-                      "properties": {"name": {"type": "string"},
-                                     "task_id": {"type": "string"}},
-                      "required": ["name"]}},
-    {"name": "remove_worktree",
-     "description": "Remove a worktree. Refuses if changes exist.",
-     "input_schema": {"type": "object",
-                      "properties": {"name": {"type": "string"},
-                                     "discard_changes": {"type": "boolean"}},
-                      "required": ["name"]}},
-    {"name": "keep_worktree",
-     "description": "Keep a worktree for manual review.",
-     "input_schema": {"type": "object",
-                      "properties": {"name": {"type": "string"}},
-                      "required": ["name"]}},
-    {"name": "connect_mcp",
-     "description": "Connect to an MCP server (docs, deploy) and discover tools.",
-     "input_schema": {"type": "object",
-                      "properties": {"name": {"type": "string"}},
-                      "required": ["name"]}},
+    _fn("bash", "Run a shell command.",
+        {"type": "object", "properties": {"command": {"type": "string"}},
+         "required": ["command"]}),
+    _fn("read_file", "Read file contents.",
+        {"type": "object",
+         "properties": {"path": {"type": "string"}, "limit": {"type": "integer"}},
+         "required": ["path"]}),
+    _fn("write_file", "Write content to a file.",
+        {"type": "object",
+         "properties": {"path": {"type": "string"}, "content": {"type": "string"}},
+         "required": ["path", "content"]}),
+    _fn("create_task", "Create a task.",
+        {"type": "object",
+         "properties": {"subject": {"type": "string"},
+                        "description": {"type": "string"},
+                        "blockedBy": {"type": "array", "items": {"type": "string"}}},
+         "required": ["subject"]}),
+    _fn("list_tasks", "List all tasks.",
+        {"type": "object", "properties": {}, "required": []}),
+    _fn("get_task", "Get full task details.",
+        {"type": "object", "properties": {"task_id": {"type": "string"}},
+         "required": ["task_id"]}),
+    _fn("claim_task", "Claim a pending task.",
+        {"type": "object", "properties": {"task_id": {"type": "string"}},
+         "required": ["task_id"]}),
+    _fn("complete_task", "Complete an in-progress task.",
+        {"type": "object", "properties": {"task_id": {"type": "string"}},
+         "required": ["task_id"]}),
+    _fn("spawn_teammate", "Spawn an autonomous teammate.",
+        {"type": "object",
+         "properties": {"name": {"type": "string"}, "role": {"type": "string"},
+                        "prompt": {"type": "string"}},
+         "required": ["name", "role", "prompt"]}),
+    _fn("send_message", "Send message to a teammate.",
+        {"type": "object",
+         "properties": {"to": {"type": "string"}, "content": {"type": "string"}},
+         "required": ["to", "content"]}),
+    _fn("check_inbox", "Check inbox for messages and protocol responses.",
+        {"type": "object", "properties": {}, "required": []}),
+    _fn("request_shutdown", "Request a teammate to shut down.",
+        {"type": "object", "properties": {"teammate": {"type": "string"}},
+         "required": ["teammate"]}),
+    _fn("request_plan", "Ask a teammate to submit a plan.",
+        {"type": "object",
+         "properties": {"teammate": {"type": "string"}, "task": {"type": "string"}},
+         "required": ["teammate", "task"]}),
+    _fn("review_plan", "Approve or reject a submitted plan.",
+        {"type": "object",
+         "properties": {"request_id": {"type": "string"},
+                        "approve": {"type": "boolean"},
+                        "feedback": {"type": "string"}},
+         "required": ["request_id", "approve"]}),
+    _fn("create_worktree", "Create an isolated git worktree.",
+        {"type": "object",
+         "properties": {"name": {"type": "string"}, "task_id": {"type": "string"}},
+         "required": ["name"]}),
+    _fn("remove_worktree", "Remove a worktree. Refuses if changes exist.",
+        {"type": "object",
+         "properties": {"name": {"type": "string"},
+                        "discard_changes": {"type": "boolean"}},
+         "required": ["name"]}),
+    _fn("keep_worktree", "Keep a worktree for manual review.",
+        {"type": "object", "properties": {"name": {"type": "string"}},
+         "required": ["name"]}),
+    _fn("connect_mcp", "Connect to an MCP server (docs, deploy) and discover tools.",
+        {"type": "object", "properties": {"name": {"type": "string"}},
+         "required": ["name"]}),
 ]
 
 BUILTIN_HANDLERS = {
@@ -972,7 +984,7 @@ def update_context(context: dict, messages: list) -> dict:
     return {"memories": memories}
 
 
-# ── Agent Loop (s19: dynamic tool pool, no prompt cache) ──
+# ── Agent Loop (Azure OpenAI, dynamic tool pool) ──
 
 def agent_loop(messages: list, context: dict):
     tools, handlers = assemble_tool_pool()
@@ -983,51 +995,55 @@ def agent_loop(messages: list, context: dict):
                 model=MODEL,
                 messages=[{"role": "system", "content": system}] + messages,
                 tools=tools,
-                max_completion_tokens=8000,
-            )
+                max_completion_tokens=8000)
         except Exception as e:
-            messages.append({"role": "assistant", "content": [
-                {"type": "text", "text": f"[Error] {type(e).__name__}: {e}"}]})
+            messages.append({"role": "assistant",
+                             "content": f"[Error] {type(e).__name__}: {e}"})
             return
 
-        assistant_msg = response.choices[0].message
-        assistant_dict = {"role": "assistant", "content": assistant_msg.content}
-        if getattr(assistant_msg, "tool_calls", None):
-            assistant_dict["tool_calls"] = [tc.model_dump() for tc in assistant_msg.tool_calls]
-        messages.append(assistant_dict)
+        choice = response.choices[0]
+        assistant_msg = choice.message
 
-        if response.choices[0].finish_reason != "tool_calls":
+        # Serialize assistant message before storing (required for Azure)
+        msg_dict = {"role": "assistant", "content": assistant_msg.content}
+        if assistant_msg.tool_calls:
+            msg_dict["tool_calls"] = [tc.model_dump() for tc in assistant_msg.tool_calls]
+        messages.append(msg_dict)
+
+        if choice.finish_reason != "tool_calls":
             return
 
-        results = []
-        if getattr(assistant_msg, "tool_calls", None):
-            for tc in assistant_msg.tool_calls:
-                if getattr(tc, "function", None) is None:
-                    continue
-                fn_name = tc.function.name
-                print(f"\033[36m> {fn_name}\033[0m")
-                args = json.loads(tc.function.arguments) if tc.function.arguments else {}
-                handler = handlers.get(fn_name)
-                output = handler(**args) if handler else "Unknown"
-                print(str(output)[:300])
-                messages.append({"role": "tool", "tool_call_id": tc.id, "content": str(output)})
-                results.append({"type": "tool_result", "tool_use_id": tc.id, "content": output})
-        messages.append({"role": "user", "content": results})
+        # Emit one standalone role="tool" message per call
+        reconnected = False
+        for tc in (assistant_msg.tool_calls or []):
+            fn_name = tc.function.name
+            print(f"\033[36m> {fn_name}\033[0m")
+            handler = handlers.get(fn_name)
+            args = json.loads(tc.function.arguments)
+            output = handler(**args) if handler else "Unknown"
+            print(str(output)[:300])
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tc.id,
+                "content": str(output),
+            })
+            if fn_name == "connect_mcp":
+                reconnected = True
 
-        if any(getattr(tc.function, "name", None) == "connect_mcp" for tc in getattr(assistant_msg, "tool_calls", []) ):
+        if reconnected:
             tools, handlers = assemble_tool_pool()
             context = update_context(context, messages)
             system = assemble_system_prompt(context)
 
 
 if __name__ == "__main__":
-    print("s19: mcp tools")
+    print("learning19: mcp tools")
     print("Enter a question, press Enter to send. Type q to quit.\n")
     history = []
     context = {"memories": ""}
     while True:
         try:
-            query = input("\033[36ms19 >> \033[0m")
+            query = input("\033[36mlearning19 >> \033[0m")
         except (EOFError, KeyboardInterrupt):
             break
         if query.strip().lower() in ("q", "exit", ""):
@@ -1035,9 +1051,11 @@ if __name__ == "__main__":
         history.append({"role": "user", "content": query})
         agent_loop(history, context)
         context = update_context(context, history)
-        for block in history[-1]["content"]:
-            if getattr(block, "type", None) == "text":
-                print(block.text)
+
+        # Print last assistant text response
+        last = history[-1]
+        if last.get("role") == "assistant" and last.get("content"):
+            print(last["content"])
 
         inbox = consume_lead_inbox(route_protocol=True)
         if inbox:
