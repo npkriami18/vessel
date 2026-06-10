@@ -1,0 +1,9 @@
+{
+  "id": "task_1781060541_6609",
+  "subject": "Inspect repository structure",
+  "description": "Review the repository layout and identify key files and directories relevant to the learning modules.",
+  "status": "pending",
+  "owner": null,
+  "blockedBy": [],
+  "worktree": "alice-task"
+}

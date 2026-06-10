@@ -5,5 +5,12 @@
     "prompt": "Check the build status.",
     "recurring": false,
     "durable": true
+  },
+  {
+    "id": "cron_882667",
+    "cron": "5 3 10 6 *",
+    "prompt": "Reminder: you have a meeting now.",
+    "recurring": false,
+    "durable": true
   }
 ]

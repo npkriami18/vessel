@@ -1,0 +1,9 @@
+{
+  "id": "task_1781060544_5368",
+  "subject": "List and summarize Python learning modules",
+  "description": "Review Python files in the repo and summarize what each learning module appears to cover.",
+  "status": "pending",
+  "owner": null,
+  "blockedBy": [],
+  "worktree": "bob-task"
+}
