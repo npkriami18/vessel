@@ -1,0 +1,9 @@
+{
+  "id": "task_1781058413_9661",
+  "subject": "Implement task B",
+  "description": "Second parallel task for teammate bob.",
+  "status": "in_progress",
+  "owner": "bob",
+  "blockedBy": [],
+  "worktree": "bob-wt"
+}
